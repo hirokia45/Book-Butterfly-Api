@@ -17,6 +17,25 @@ exports.getNotes = async (req, res, next) => {
   }
 };
 
+exports.getNote = async (req, res, next) => {
+  const noteId = req.params.noteId;
+
+  try {
+    const note = await Note.findById(noteId)
+    if (!note) {
+      const error = new Error('COuld not find note...');
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json({ message: 'Note fetched.', note: note });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 // app.get('/posts', (request, response) => {
 //   response.set('Access-Control-Allow-Origin', '*')
 
@@ -50,6 +69,27 @@ exports.createNote = async (req, res, next) => {
       message: 'Note created successfully!',
       note: note,
     })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+}
+
+exports.deleteNote = async (req, res, next) => {
+  const noteId = req.params.noteId;
+
+  try {
+    const note = await Note.findById(noteId)
+    if (!note) {
+      const error = new Error('Could not find note.');
+      error.statusCode = 404;
+      throw error;
+    }
+    await Note.findByIdAndRemove(noteId);
+
+    res.status(200).json({ message: 'Deleted note.' });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

@@ -6,8 +6,11 @@ const router = new express.Router();
 
 // GET /notes
 router.get('/notes', noteController.getNotes);
+router.get('/notes/:noteId', noteController.getNote);
 
 router.post('/notes', noteController.createNote);
+
+router.delete('/notes/:noteId', noteController.deleteNote);
 
 
 
