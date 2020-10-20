@@ -1,5 +1,8 @@
+let inspect = require('util').inspect;
+let Busboy = require('busboy');
 
 const { validationResult } = require('express-validator');
+const { request } = require('../app');
 const Note = require('../models/note');
 
 exports.getNotes = async (req, res, next) => {
@@ -75,6 +78,81 @@ exports.createNote = async (req, res, next) => {
     }
     next(err);
   }
+}
+
+exports.updateNote = (req, res, next) => {
+  const noteId = req.params.noteId;
+  let busboy = new Busboy({ headers: req.headers });
+
+  let fields = {};
+
+  busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+    console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+    file.on('data', function(data) {
+      console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
+    });
+    file.on('end', function() {
+      console.log('File [' + fieldname + '] Finished');
+    });
+  });
+
+  busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+    fields[fieldname] = val;
+  });
+
+  busboy.on('finish', function () {
+    const errors = validationResult(req)
+    const updates = Object.keys(fields)
+    const allowedUpdates = ["_id", "title", "author", "category", "pageFrom", "pageTo", "comment"]
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!errors.isEmpty() || !isValidOperation) {
+      const error = new Error('Validation failed, entered data is incorrect.');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    // let imageUrl = req.body.image;
+    // if (req.file) {
+    //   imageUrl = req.file.path.replace("\\", "/");
+    // }
+    // if (!imageUrl) {
+    //   const error = new Error('No file picked.');
+    //   error.statusCode = 422;
+    //   throw error;
+    // }
+
+    Note.findById(noteId)
+    .then(note => {
+      if (!note) {
+        const error = new Error('Could not find post.')
+        error.statusCode = 404
+        throw error
+      }
+      // if (imageUrl !== post.imageUrl) {
+      //   clearImage(post.imageUrl);
+      // }
+      console.log('updates: ',updates);
+      console.log('fields: ', fields);
+      updates.forEach((update) => (note[update] = fields[update]))
+      return note.save()
+    })
+    .then(result => {
+      return res.status(200).json({
+        message: 'Note updated!',
+        note: result,
+      })
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    });
+
+  });
+
+  req.pipe(busboy);
 }
 
 exports.deleteNote = async (req, res, next) => {
