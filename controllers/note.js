@@ -39,20 +39,7 @@ exports.getNote = async (req, res, next) => {
   }
 };
 
-// app.get('/posts', (request, response) => {
-//   response.set('Access-Control-Allow-Origin', '*')
 
-//   let posts = []
-//   db.collection('posts')
-//     .orderBy('date', 'desc')
-//     .get()
-//     .then((snapshot) => {
-//       snapshot.forEach((doc) => {
-//         posts.push(doc.data())
-//       })
-//       response.send(posts)
-//     })
-// })
 exports.createNote = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -63,7 +50,8 @@ exports.createNote = async (req, res, next) => {
 
   const note = new Note({
     ...req.body,
-    owner: 'Hiroki'
+    owner: 'Hiroki',
+    photo: null
   })
 
   try {

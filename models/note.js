@@ -30,8 +30,12 @@ const noteSchema = new mongoose.Schema({
   },
   owner: {
     type: String,
-    requiers: false
+    required: false
+  },
+  photo: {
+    type: Buffer
   }
+
 }, {
   timestamps: true
 })
