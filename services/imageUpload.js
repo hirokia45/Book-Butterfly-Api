@@ -23,16 +23,15 @@ const upload = multer({
   storage: multerS3({
     acl: 'public-read',
     s3,
-    bucket: 'bookbutterfly',
+    bucket: process.env.BUCKET_NAME,
     metadata: function (req, file, cb) {
       cb(null, { fileName: file.originalname })
     },
     limits: { fileSize: 2000000 },
     key: function (req, file, cb) {
-      console.log(file)
       cb(null, Date.now() + file.originalname)
     },
   }),
 })
 
-module.exports = upload;
+module.exports = upload
