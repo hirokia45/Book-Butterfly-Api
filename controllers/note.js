@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { request } = require('../app');
+const aws = require('aws-sdk')
 const Note = require('../models/note');
 
 exports.getNotes = async (req, res, next) => {
@@ -112,6 +113,31 @@ exports.deleteNote = async (req, res, next) => {
       throw error;
     }
     await Note.findByIdAndRemove(noteId);
+
+    const photoUrl = note.photo
+    const photoKey = /[^/]*$/.exec(photoUrl)[0]
+    note.photo = null
+
+    const s3 = new aws.S3()
+
+    aws.config.update({
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_ACCESS_SECRET,
+      region: process.env.REGION,
+    })
+
+    let params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: photoKey,
+    }
+
+    s3.deleteObject(params, (err, data) => {
+      if (err) {
+        console.log(err)
+      } else {
+        return
+      }
+    })
 
     res.status(200).json({ message: 'Deleted note.' });
   } catch (err) {
