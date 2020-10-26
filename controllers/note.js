@@ -30,6 +30,7 @@ exports.getNote = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+
     res.status(200).json({ message: 'Note fetched.', note: note });
   } catch (err) {
     if (!err.statusCode) {
@@ -84,7 +85,8 @@ exports.updateNote = (req, res, next) => {
     });
   });
 
-  busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+  busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+    console.log('Field [' + fieldname + ']: value: ' + inspect(val))
     fields[fieldname] = val;
   });
 
@@ -100,16 +102,6 @@ exports.updateNote = (req, res, next) => {
       throw error;
     }
 
-    // let imageUrl = req.body.image;
-    // if (req.file) {
-    //   imageUrl = req.file.path.replace("\\", "/");
-    // }
-    // if (!imageUrl) {
-    //   const error = new Error('No file picked.');
-    //   error.statusCode = 422;
-    //   throw error;
-    // }
-
     Note.findById(noteId)
     .then(note => {
       if (!note) {
@@ -117,11 +109,6 @@ exports.updateNote = (req, res, next) => {
         error.statusCode = 404
         throw error
       }
-      // if (imageUrl !== post.imageUrl) {
-      //   clearImage(post.imageUrl);
-      // }
-      console.log('updates: ',updates);
-      console.log('fields: ', fields);
       updates.forEach((update) => (note[update] = fields[update]))
       return note.save()
     })
