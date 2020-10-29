@@ -1,20 +1,22 @@
 const express = require('express');
 
 const noteController = require('../controllers/note');
-const uploadController = require('../controllers/upload');
+const imageController = require('../controllers/image');
+
+const isAuth = require('../middleware/is-auth')
+const upload = require('../services/imageUpload')
 
 const router = new express.Router();
 
-// GET /notes
-router.get('/notes', noteController.getNotes);
-router.get('/notes/:noteId', noteController.getNote);
+router.get('/notes', isAuth, noteController.getNotes);
+router.get('/notes/:noteId', isAuth, noteController.getNote);
 
-router.post('/notes', noteController.createNote);
+router.post('/notes', isAuth, noteController.createNote);
 
-router.patch('/notes/:noteId', noteController.updateNote);
-router.post('/notes/:noteId', uploadController.uploadImage);
+router.patch('/notes/:noteId', isAuth, noteController.updateNote);
+router.post('/notes/:noteId', isAuth, upload.single("file"), imageController.uploadImage);
 
-router.delete('/notes/photo/:noteId', uploadController.deleteImage);
-router.delete('/notes/:noteId', noteController.deleteNote);
+router.delete('/notes/photo/:noteId', isAuth, imageController.deleteImage);
+router.delete('/notes/:noteId', isAuth, noteController.deleteNote);
 
 module.exports = router;

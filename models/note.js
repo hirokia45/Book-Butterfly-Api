@@ -25,13 +25,18 @@ const noteSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
+    chapter: {
+      type: String,
+      required: false
+    },
     comment: {
       type: String,
       required: false,
     },
     owner: {
-      type: String,
-      required: false,
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User'
     },
     photo: {
       type: String,

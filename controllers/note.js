@@ -5,10 +5,10 @@ const Note = require('../models/note');
 
 exports.getNotes = async (req, res, next) => {
   try {
-    const notes = await Note.find()
+    await req.user.populate('notes').execPopulate()
     res.status(200).json({
       message: 'Fetched notes successfully',
-      notes: notes,
+      notes: req.user.notes
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -19,12 +19,16 @@ exports.getNotes = async (req, res, next) => {
 };
 
 exports.getNote = async (req, res, next) => {
-  const noteId = req.params.noteId;
+  const _id = req.params.noteId;
 
   try {
-    const note = await Note.findById(noteId)
+    // const note = await Note.findById(noteId)
+    const note = await Note.findOne({
+      _id,
+      owner: req.user._id
+    })
     if (!note) {
-      const error = new Error('COuld not find note...');
+      const error = new Error('Could not find note...');
       error.statusCode = 404;
       throw error;
     }
@@ -49,7 +53,7 @@ exports.createNote = async (req, res, next) => {
 
   const note = new Note({
     ...req.body,
-    owner: 'Hiroki',
+    owner: req.user._id,
     photo: null
   })
 
@@ -68,7 +72,7 @@ exports.createNote = async (req, res, next) => {
 }
 
 exports.updateNote = async (req, res, next) => {
-  const noteId = req.params.noteId;
+  const _id = req.params.noteId;
 
   const errors = validationResult(req)
   const updates = Object.keys(req.body)
@@ -82,12 +86,14 @@ exports.updateNote = async (req, res, next) => {
     throw error;
   }
   try {
-    const note = await Note.findById(noteId)
+    const note = await Note.findOne({ _id, owner: req.user._id})
+
     if (!note) {
       const error = new Error('Could not find post.')
       error.statusCode = 404
       throw error
     }
+
     updatingFields.forEach((update) => (note[update] = req.body[update]))
     const result = await note.save()
     res.status(200).json({
@@ -103,43 +109,46 @@ exports.updateNote = async (req, res, next) => {
 }
 
 exports.deleteNote = async (req, res, next) => {
-  const noteId = req.params.noteId;
+  const _id = req.params.noteId;
 
   try {
-    const note = await Note.findById(noteId)
+    const note = await Note.findOneAndDelete({ _id, owner: req.user._id })
+
     if (!note) {
       const error = new Error('Could not find note.');
       error.statusCode = 404;
       throw error;
     }
-    await Note.findByIdAndRemove(noteId);
 
-    const photoUrl = note.photo
-    const photoKey = /[^/]*$/.exec(photoUrl)[0]
-    note.photo = null
+    if (note.photo) {
+      const photoUrl = note.photo
+      const photoKey = /[^/]*$/.exec(photoUrl)[0]
+      note.photo = null
 
-    const s3 = new aws.S3()
+      const s3 = new aws.S3()
 
-    aws.config.update({
-      accessKeyId: process.env.S3_ACCESS_KEY,
-      secretAccessKey: process.env.S3_ACCESS_SECRET,
-      region: process.env.REGION,
-    })
+      aws.config.update({
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_ACCESS_SECRET,
+        region: process.env.REGION,
+      })
 
-    let params = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: photoKey,
+      let params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: photoKey,
+      }
+
+      s3.deleteObject(params, (err, data) => {
+        if (err) {
+          console.log("Error: " + err);
+        } else {
+          console.log('Successfully deleted the image');
+        }
+        console.log(data);
+      })
     }
 
-    s3.deleteObject(params, (err, data) => {
-      if (err) {
-        console.log(err)
-      } else {
-        return
-      }
-    })
-
-    res.status(200).json({ message: 'Deleted note.' });
+    res.status(200).json({ message: 'Deleted note.'});
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
