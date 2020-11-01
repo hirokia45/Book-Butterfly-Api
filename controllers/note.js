@@ -6,9 +6,14 @@ const Note = require('../models/note');
 exports.getNotes = async (req, res, next) => {
   try {
     await req.user.populate('notes').execPopulate()
+
+    const notes = req.user.notes.map(note => ({
+      ...note._doc, owner: req.user.name
+    }))
+
     res.status(200).json({
       message: 'Fetched notes successfully',
-      notes: req.user.notes
+      notes
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -23,17 +28,21 @@ exports.getNote = async (req, res, next) => {
 
   try {
     // const note = await Note.findById(noteId)
-    const note = await Note.findOne({
+    const noteFound = await Note.findOne({
       _id,
       owner: req.user._id
     })
-    if (!note) {
+    if (!noteFound) {
       const error = new Error('Could not find note...');
       error.statusCode = 404;
       throw error;
     }
 
-    res.status(200).json({ message: 'Note fetched.', note: note });
+    const note = {
+      ...noteFound._doc, owner: req.user.name
+    }
+
+    res.status(200).json({ message: 'Note fetched.', note });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

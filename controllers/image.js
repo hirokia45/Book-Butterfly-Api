@@ -22,7 +22,7 @@ exports.uploadImage = async (req, res, next) => {
 
   let update = req.file.location
   try {
-    const note = Note.findOne({ _id, owner: req.user._id })
+    const note = await Note.findOne({ _id, owner: req.user._id })
 
     if (!note) {
       const error = new Error('Could not find note.')
@@ -30,10 +30,14 @@ exports.uploadImage = async (req, res, next) => {
       throw error
     }
 
-    note.photo = update
-    const result = note.save()
+    note.photo = update;
 
-    res.status(200).json({ message: 'Note updated!', note: result })
+    const result = await note.save();
+
+    const modifiedResult = {
+      ...result._doc, owner: req.user.name,
+    }
+    res.status(200).json({ message: 'Note updated!', note: modifiedResult })
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500
@@ -78,7 +82,11 @@ exports.deleteImage = async (req, res, next) => {
     })
 
     const result = await note.save();
-    res.status(200).json({ message: 'Image Deleted.', note: result });
+
+    const modifiedResult = {
+      ...result._doc, owner: req.user.name,
+    }
+    res.status(200).json({ message: 'Image Deleted.', note: modifiedResult });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
