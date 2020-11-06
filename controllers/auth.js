@@ -18,9 +18,19 @@ exports.signup = async (req, res, next) => {
     const token = await user.generateAuthToken()
     res.status(201).json({ message: 'User created!', token, user })
   } catch (err) {
+
+    // if (err.name === 'MongoError' && err.code === 11000) {
+    //   err.message = 'The email address is already taken!'
+    //   err.statusCode = 422
+    //   // return res.status(422).send({ success: false, message: 'User already exist!' })
+    //   //throw error
+    //   console.log('EROORORR', err);
+    // }
+
     if (!err.statusCode) {
       err.statusCode = 500
     }
+
     next(err);
   }
 }
@@ -40,7 +50,6 @@ exports.login = async (req, res, next) => {
 }
 
 exports.logout = async (req, res, next) => {
-  console.log('logoutReq: ', req.headers);
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token;
@@ -58,6 +67,7 @@ exports.logout = async (req, res, next) => {
 
 exports.logoutAll = async (req, res, next) => {
   try {
+    console.log('logging out all');
     req.user.tokens = [];
     await req.user.save();
     res.status(200).json({ message: 'Logged out all!', user: req.user });

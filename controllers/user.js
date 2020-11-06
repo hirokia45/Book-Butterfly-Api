@@ -12,12 +12,14 @@ exports.getOwnProfile = async (req, res) => {
 }
 
 exports.updateProfile = async (req, res, next) => {
+  console.log(req.body);
   const errors = validationResult(req)
   const updates = Object.keys(req.body)
   const allowedUpdates = [
     'name',
     'email',
-    'password'
+    'password',
+    'favoriteBook'
   ]
   const updatingFields = updates.filter((field) =>
     allowedUpdates.includes(field)
@@ -32,10 +34,17 @@ exports.updateProfile = async (req, res, next) => {
     throw error
   }
   try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token
+    })
+
     updatingFields.forEach((update) => req.user[update] = req.body[update])
     await req.user.save()
+
+    const token = await req.user.generateAuthToken()
     res.status(200).json({
       message: 'User profile updated!',
+      token,
       user: req.user
     })
   } catch (err) {

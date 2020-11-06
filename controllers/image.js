@@ -94,3 +94,65 @@ exports.deleteImage = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.uploadAvatar = async (req, res, next) => {
+  let update = req.file.location
+
+  try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token
+    })
+
+    if (req.user.avatar) {
+      const photoUrl = req.user.avatar
+      const photoKey = /[^/]*$/.exec(photoUrl)[0]
+
+      const s3 = new aws.S3()
+
+      aws.config.update({
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_ACCESS_SECRET,
+        region: process.env.REGION,
+      })
+
+      let params = {
+        Bucket: process.env.BUCKET_NAME_AVATAR,
+        Key: photoKey,
+      }
+
+      s3.deleteObject(params, (err, data) => {
+        if (err) {
+          console.log('Error: ' + err)
+        } else {
+          console.log('Successfully deleted the old avatar')
+        }
+      })
+    }
+
+    req.user.avatar = update;
+
+    await req.user.save();
+
+    const token = await req.user.generateAuthToken()
+
+    res.status(200).json({ message: 'Avatar updated!', token, user: req.user })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+
+
+  //   const buffer = await sharp(req.file.buffer)
+  //     .resize({ width: 250, height: 250 })
+  //     .png()
+  //     .toBuffer()
+  //   req.user.avatar = buffer
+  //   await req.user.save()
+  //   res.send()
+  // },
+  // (error, req, res, next) => {
+  //   res.status(400).send({ error: error.message })

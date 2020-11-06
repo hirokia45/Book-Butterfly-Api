@@ -8,7 +8,8 @@ exports.getNotes = async (req, res, next) => {
     await req.user.populate('notes').execPopulate()
 
     const notes = req.user.notes.map(note => ({
-      ...note._doc, owner: req.user.name
+      ...note._doc,
+      owner: req.user.name,
     }))
 
     res.status(200).json({
@@ -66,11 +67,15 @@ exports.createNote = async (req, res, next) => {
     photo: null
   })
 
+  const noteModified = {
+    ...note._doc, owner: req.user.name,
+  }
+
   try {
     await note.save()
     res.status(201).json({
       message: 'Note created successfully!',
-      note: note,
+      note: noteModified,
     })
   } catch (err) {
     if (!err.statusCode) {

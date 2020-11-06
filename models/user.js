@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     lowercase: true,
-    valudate(value) {
+    validate(value) {
       if (!validator.isEmail(value)) {
         throw new Error("Email is invalid");
       }
@@ -27,12 +27,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 7,
+    minlength: 6,
     validate(value) {
       if (value.toLowerCase().includes("password")) {
         throw new Error("Password cannot contain 'password'");
       }
     }
+  },
+  avatar: {
+    type: String,
+    required: false
+  },
+  favoriteBook: {
+    type: String,
+    required: false,
+    trim: true
   },
   tokens: [{
     token: {
@@ -95,6 +104,16 @@ userSchema.pre('save', async function (next) {
 
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8)
+  }
+
+  next()
+})
+
+userSchema.post('save', function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    const error = new Error('The email is already taken!')
+    error.statusCode = 409
+    throw error
   }
 
   next()

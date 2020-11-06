@@ -25,7 +25,7 @@ app.use(noteRouter);
 
 
 app.use((error, req, res, next) => {
-  console.log(error);
+  console.log('error in app: ', error.message );
   const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
