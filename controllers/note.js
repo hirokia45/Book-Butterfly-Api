@@ -4,8 +4,27 @@ const aws = require('aws-sdk')
 const Note = require('../models/note');
 
 exports.getNotes = async (req, res, next) => {
+  const currentPage = req.query.page || 1
+  const perPage = req.query.per_page
+  const sort = {}
+
+  // Sort req.query.sortBy === /notes?sortBy=createdAt:desc
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':')
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+  }
+
   try {
-    await req.user.populate('notes').execPopulate()
+    const totalItems = await Note.find({ owner: req.user._id }).countDocuments();
+    const totalPages = Math.floor(totalItems / perPage) + 1
+    await req.user.populate({
+      path: 'notes',
+      options: {
+        skip: (currentPage - 1) * perPage,
+        limit: perPage,
+        sort
+      }
+    }).execPopulate()
 
     const notes = req.user.notes.map(note => ({
       ...note._doc,
@@ -14,7 +33,9 @@ exports.getNotes = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Fetched notes successfully',
-      notes
+      notes,
+      totalItems,
+      totalPages
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -67,12 +88,12 @@ exports.createNote = async (req, res, next) => {
     photo: null
   })
 
-  const noteModified = {
-    ...note._doc, owner: req.user.name,
-  }
-
   try {
-    await note.save()
+    const result = await note.save()
+    const noteModified = {
+      ...result._doc, owner: req.user.name,
+    }
+    console.log(noteModified);
     res.status(201).json({
       message: 'Note created successfully!',
       note: noteModified,
@@ -110,9 +131,13 @@ exports.updateNote = async (req, res, next) => {
 
     updatingFields.forEach((update) => (note[update] = req.body[update]))
     const result = await note.save()
+
+    const noteModified = {
+      ...result._doc, owner: req.user.name,
+    }
     res.status(200).json({
       message: 'Note updated!',
-      note: result,
+      note: noteModified,
     })
   } catch (err) {
     if (!err.statusCode) {

@@ -36,7 +36,7 @@ const avatarUpload = multer({
       {
         id: 'original',
         key: function (req, file, cb) {
-          cb(null, 'avatar' + Date.now() + file.originalname)
+          cb(null, Date.now() + file.originalname)
         },
         transform: function (req, file, cb) {
           cb(null, sharp(), resize(250, 250).png())
