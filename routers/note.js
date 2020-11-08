@@ -10,6 +10,7 @@ const router = new express.Router();
 
 router.get('/notes', isAuth, noteController.getNotes);
 router.get('/notes/:noteId', isAuth, noteController.getNote);
+router.get('/calendar', isAuth, noteController.getCalendarInfo);
 
 router.post('/notes', isAuth, noteController.createNote);
 

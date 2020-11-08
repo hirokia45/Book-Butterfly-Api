@@ -195,3 +195,48 @@ exports.deleteNote = async (req, res, next) => {
     next(err);
   }
 }
+
+exports.getCalendarInfo = async (req, res, next) => {
+  const currentPage = req.query.page || 1
+  const perPage = req.query.per_page
+  const sort = {}
+
+  // Sort req.query.sortBy === /notes?sortBy=createdAt:desc
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':')
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+  }
+
+  try {
+    const totalItems = await Note.find({ owner: req.user._id }).countDocuments()
+    await req.user
+      .populate({
+        path: 'notes',
+        options: {
+          skip: (currentPage - 1) * perPage,
+          limit: perPage,
+          sort,
+        },
+      })
+      .execPopulate()
+
+    const info = req.user.notes.map((note) => ({
+      _id: note._doc._id,
+      title: note._doc.title,
+      pageFrom: note._doc.pageFrom,
+      pageTo: note._doc.pageTo,
+      createdAt: note._doc.createdAt
+    }))
+
+    res.status(200).json({
+      message: 'Fetched notes successfully',
+      info,
+      totalItems,
+    })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
