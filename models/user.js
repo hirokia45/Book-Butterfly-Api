@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const aws = require('aws-sdk');
 const Note = require('./note');
+const Book = require('./book');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -55,6 +56,12 @@ const userSchema = new mongoose.Schema({
 
 userSchema.virtual('notes', {
   ref: 'Note',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
+userSchema.virtual('books', {
+  ref: 'Book',
   localField: '_id',
   foreignField: 'owner'
 })

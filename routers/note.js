@@ -3,8 +3,8 @@ const express = require('express');
 const noteController = require('../controllers/note');
 const imageController = require('../controllers/image');
 
-const isAuth = require('../middleware/is-auth')
-const upload = require('../services/imageUpload')
+const isAuth = require('../middleware/is-auth');
+const upload = require('../services/imageUpload');
 
 const router = new express.Router();
 
