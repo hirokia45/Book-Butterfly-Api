@@ -109,7 +109,6 @@ exports.createNote = async (req, res, next) => {
 exports.updateNote = async (req, res, next) => {
   const _id = req.params.noteId;
 
-  const errors = validationResult(req)
   const updates = Object.keys(req.body)
   const allowedUpdates = ["title", "author", "category", "pageFrom", "pageTo", "comment"]
   const updatingFields = updates.filter((field) => allowedUpdates.includes(field));

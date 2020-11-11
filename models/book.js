@@ -2,43 +2,49 @@ const mongoose = require('mongoose');
 
 const bookSchema = new mongoose.Schema(
   {
-    bookId: {
+    id: {
       type: String,
       required: true,
       unique: false
     },
-    industryIdentifiers: [
-      {
-        type: {
-          type: String,
+    volumeInfo: {
+      industryIdentifiers: [
+        {
+          type: {
+            type: String,
+          },
+          identifier: {
+            type: String,
+          },
         },
-        identifier: {
-          type: String,
-        },
+      ],
+      title: {
+        type: String,
+        required: true,
       },
-    ],
-    title: {
-      type: String,
-      required: true,
-    },
-    subtitle: {
-      type: String,
-    },
-    authors: [String],
-    publisher: {
-      type: String,
-    },
-    publishedDate: {
-      type: String,
-    },
-    description: {
-      type: String,
-    },
-    category: {
-      type: String,
-    },
-    thumbnail: {
-      type: String,
+      subtitle: {
+        type: String,
+      },
+      authors: [String],
+      publisher: {
+        type: String,
+      },
+      publishedDate: {
+        type: String,
+      },
+      description: {
+        type: String,
+      },
+      categories: [
+        {
+          type: String,
+        }
+      ],
+      imageLinks: {
+        thumbnail: {
+          type: String
+        }
+      }
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -55,7 +61,7 @@ const bookSchema = new mongoose.Schema(
     },
     myRate: {
       type: Number,
-      default: null
+      default: 0
     }
   },
   {

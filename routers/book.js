@@ -12,6 +12,8 @@ router.get('/books/bookshelf', isAuth, bookController.getMyBooks);
 
 router.post('/books/bookshelf', isAuth, bookController.addToBookshelf);
 
+router.patch('/books/bookshelf', isAuth, bookController.updateBookInfo);
 
+router.delete('/books/bookshelf/:myBookId', isAuth, bookController.removeMyBook)
 
 module.exports = router;
