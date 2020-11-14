@@ -36,6 +36,7 @@ exports.getMyBooks = async (req, res, next) => {
   }
 
   try {
+    const totalBooksCompleted = await Book.find({ completed: true, owner: req.user._id }).countDocuments();
     await req.user.populate({
       path: 'books',
       options: {
@@ -45,7 +46,8 @@ exports.getMyBooks = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Fetched books successfully',
-      myBooks: req.user.books
+      myBooks: req.user.books,
+      totalBooksCompleted
     })
   } catch (err) {
     if (!err.statusCode) {

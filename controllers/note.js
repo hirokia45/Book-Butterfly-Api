@@ -1,5 +1,4 @@
 const { validationResult } = require('express-validator');
-const { request } = require('../app');
 const aws = require('aws-sdk')
 const Note = require('../models/note');
 
@@ -15,8 +14,8 @@ exports.getNotes = async (req, res, next) => {
   }
 
   try {
-    const totalItems = await Note.find({ owner: req.user._id }).countDocuments();
-    const totalPages = Math.floor(totalItems / perPage) + 1
+    const totalNotes = await Note.find({ owner: req.user._id }).countDocuments();
+    const totalPages = Math.floor(totalNotes / perPage) + 1
     await req.user.populate({
       path: 'notes',
       options: {
@@ -34,7 +33,7 @@ exports.getNotes = async (req, res, next) => {
     res.status(200).json({
       message: 'Fetched notes successfully',
       notes,
-      totalItems,
+      totalNotes,
       totalPages
     });
   } catch (err) {
@@ -110,7 +109,7 @@ exports.updateNote = async (req, res, next) => {
   const _id = req.params.noteId;
 
   const updates = Object.keys(req.body)
-  const allowedUpdates = ["title", "author", "category", "pageFrom", "pageTo", "comment"]
+  const allowedUpdates = ["title", "author", "category", "pageFrom", "pageTo", "chapter", "comment"]
   const updatingFields = updates.filter((field) => allowedUpdates.includes(field));
   const isValidOperation = updatingFields.every((update) => allowedUpdates.includes(update))
 
@@ -207,7 +206,7 @@ exports.getCalendarInfo = async (req, res, next) => {
   }
 
   try {
-    const totalItems = await Note.find({ owner: req.user._id }).countDocuments()
+    const totalNotes = await Note.find({ owner: req.user._id }).countDocuments()
     await req.user
       .populate({
         path: 'notes',
@@ -230,7 +229,7 @@ exports.getCalendarInfo = async (req, res, next) => {
     res.status(200).json({
       message: 'Fetched notes successfully',
       info,
-      totalItems,
+      totalNotes
     })
   } catch (err) {
     if (!err.statusCode) {

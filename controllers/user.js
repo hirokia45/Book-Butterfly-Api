@@ -1,6 +1,8 @@
 const { validationResult } = require('express-validator')
 
-const User = require('../models/user')
+const Note = require('../models/note');
+const User = require('../models/user');
+const Book = require('../models/book');
 
 exports.getOwnProfile = async (req, res) => {
   res
@@ -59,6 +61,25 @@ exports.deleteProfile = async (req, res, next) => {
   try {
     await req.user.remove();
     res.status(200).json({ message: 'Profile deleted.', user: req.user })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+exports.countTotalItems = async (req, res, next) => {
+  try {
+    const totalNotes = await Note.find({ owner: req.user._id }).countDocuments();
+
+    const totalBooksCompleted = await Book.find({ completed: true, owner: req.user._id }).countDocuments();
+
+    res.status(200).json({
+      message: 'Counted items successfully',
+      totalNotes,
+      totalBooksCompleted
+    })
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500

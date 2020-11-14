@@ -10,6 +10,8 @@ const router = new express.Router();
 
 router.get('/users/me', isAuth, userController.getOwnProfile);
 
+router.get('/users/me/total', isAuth, userController.countTotalItems);
+
 router.patch('/users/me', isAuth, userController.updateProfile);
 
 router.put('/users/me/avatar', isAuth, avatarUpload.single('file'), imageController.uploadAvatar);
