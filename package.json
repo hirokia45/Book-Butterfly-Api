@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "env-cmd -f ./config/dev.env nodemon index.js"
+    "dev": "env-cmd -f ./config/dev.env nodemon index.js",
+    "test": "env-cmd -f ./config/test.env jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -23,12 +26,13 @@
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
     "querystring": "^0.2.0",
-    "request": "^2.88.2",
     "sharp": "^0.26.2",
     "validator": "^13.1.17"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
-    "nodemon": "^2.0.5"
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.5",
+    "supertest": "^6.0.1"
   }
 }

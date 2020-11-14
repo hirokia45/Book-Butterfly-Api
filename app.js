@@ -7,7 +7,6 @@ const userRouter = require('./routers/user');
 const noteRouter = require('./routers/note');
 const bookRouter = require('./routers/book');
 
-
 const app = express();
 
 app.use(cors());
@@ -24,7 +23,6 @@ app.use(authRouter);
 app.use(userRouter);
 app.use(noteRouter);
 app.use(bookRouter);
-
 
 app.use((error, req, res, next) => {
   console.log('error in app: ', error.message );
