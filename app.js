@@ -1,6 +1,5 @@
 const express = require('express');
 require('./db/mongoose');
-const cors = require("cors");
 
 const authRouter = require('./routers/auth');
 const userRouter = require('./routers/user');
@@ -9,7 +8,6 @@ const bookRouter = require('./routers/book');
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
