@@ -1,6 +1,8 @@
 const { validationResult } = require('express-validator');
-const aws = require('aws-sdk')
+const aws = require('aws-sdk');
 const Note = require('../models/note');
+const Notification = require('../models/notification');
+//const letters = require('../services/letters');
 
 exports.getNotes = async (req, res, next) => {
   const currentPage = req.query.page || 1
@@ -25,6 +27,7 @@ exports.getNotes = async (req, res, next) => {
       }
     }).execPopulate()
 
+
     const notes = req.user.notes.map(note => ({
       ...note._doc,
       owner: req.user.name,
@@ -34,8 +37,8 @@ exports.getNotes = async (req, res, next) => {
       message: 'Fetched notes successfully',
       notes,
       totalNotes,
-      totalPages
-    });
+      totalPages,
+    })
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -87,6 +90,15 @@ exports.createNote = async (req, res, next) => {
     photo: null
   })
 
+  const letterTemplate = req.letter
+  if (letterTemplate) {
+    const letter = new Notification({
+      ...letterTemplate,
+      owner: req.user._id
+    })
+    var congratsLetter = await letter.save()
+  }
+
   try {
     const result = await note.save()
     const noteModified = {
@@ -95,6 +107,7 @@ exports.createNote = async (req, res, next) => {
     res.status(201).json({
       message: 'Note created successfully!',
       note: noteModified,
+      congratsLetter
     })
   } catch (err) {
     if (!err.statusCode) {

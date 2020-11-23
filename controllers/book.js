@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const Book = require('../models/book');
+const Notification = require('../models/notification');
 const axios = require('axios');
 const qs = require('querystring');
 
@@ -116,12 +117,23 @@ exports.updateBookInfo = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
+    if (updatingFields[0] === 'completed') {
+      const letterTemplate = req.letter
+      if (letterTemplate) {
+        const letter = new Notification({
+          ...letterTemplate,
+          owner: req.user._id,
+        })
+        var congratsLetter = await letter.save()
+      }
+    }
 
     updatingFields.forEach((update) => (book[update] = req.body[update]))
     const result = await book.save();
     res.status(200).json({
       message: 'Book updated',
-      result
+      result,
+      congratsLetter
     })
   } catch (err) {
     console.log(err)
