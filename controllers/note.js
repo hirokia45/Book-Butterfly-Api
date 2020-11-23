@@ -92,7 +92,6 @@ exports.createNote = async (req, res, next) => {
     const noteModified = {
       ...result._doc, owner: req.user.name,
     }
-    console.log(noteModified);
     res.status(201).json({
       message: 'Note created successfully!',
       note: noteModified,

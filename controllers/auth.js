@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
+const Notification = require('../models/notification')
 
 exports.signup = async (req, res, next) => {
   const errors = validationResult(req);
@@ -13,19 +14,22 @@ exports.signup = async (req, res, next) => {
 
   const user = new User(req.body);
 
+
   try {
     await user.save()
     const token = await user.generateAuthToken()
-    res.status(201).json({ message: 'User created!', token, user })
-  } catch (err) {
+    const notification = new Notification({
+      title: 'Welcome to Book Butterfly',
+      message: 'Thank you for signing up! Enjoy this app!',
+      icon: 'eva-smiling-face-outline',
+      color: 'pink-4',
+      textColor: 'white',
+      owner: user._id,
+    })
+    const welcomeMessage = await notification.save()
 
-    // if (err.name === 'MongoError' && err.code === 11000) {
-    //   err.message = 'The email address is already taken!'
-    //   err.statusCode = 422
-    //   // return res.status(422).send({ success: false, message: 'User already exist!' })
-    //   //throw error
-    //   console.log('EROORORR', err);
-    // }
+    res.status(201).json({ message: 'User created!', token, user, welcomeMessage })
+  } catch (err) {
 
     if (!err.statusCode) {
       err.statusCode = 500

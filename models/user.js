@@ -6,53 +6,60 @@ const aws = require('aws-sdk');
 const Note = require('./note');
 const Book = require('./book');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: true,
-    trim: true,
-    lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Email is invalid");
-      }
-    }
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 6,
-    validate(value) {
-      if (value.toLowerCase().includes("password")) {
-        throw new Error("Password cannot contain 'password'");
-      }
-    }
-  },
-  avatar: {
-    type: String,
-    required: false
-  },
-  favoriteBook: {
-    type: String,
-    required: false,
-    trim: true
-  },
-  tokens: [{
-    token: {
+const userSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      required: true
-    }
-  }]
-}, {
-  timestamps: true
-});
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Email is invalid')
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 6,
+      validate(value) {
+        if (value.toLowerCase().includes('password')) {
+          throw new Error("Password cannot contain 'password'")
+        }
+      },
+    },
+    avatar: {
+      type: String,
+      required: false,
+      default:
+        'https://book-buttefly-static-images.s3-ap-northeast-1.amazonaws.com/default-avatar.png',
+    },
+    favoriteBook: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+)
 
 userSchema.virtual('notes', {
   ref: 'Note',
@@ -62,6 +69,18 @@ userSchema.virtual('notes', {
 
 userSchema.virtual('books', {
   ref: 'Book',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
+userSchema.virtual('notifications', {
+  ref: 'Notification',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
+userSchema.virtual('subscriptions', {
+  ref: 'Subscription',
   localField: '_id',
   foreignField: 'owner'
 })

@@ -5,6 +5,8 @@ const authRouter = require('./routers/auth');
 const userRouter = require('./routers/user');
 const noteRouter = require('./routers/note');
 const bookRouter = require('./routers/book');
+const notificationRouter = require('./routers/notification');
+const subscriptionRouter = require('./routers/subscription');
 
 const app = express();
 
@@ -21,6 +23,8 @@ app.use(authRouter);
 app.use(userRouter);
 app.use(noteRouter);
 app.use(bookRouter);
+app.use(notificationRouter);
+app.use(subscriptionRouter);
 
 app.use((error, req, res, next) => {
   console.log('error in app: ', error.message );

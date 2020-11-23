@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon index.js",
-    "test": "env-cmd -f ./config/test.env jest --watch"
+    "test": "env-cmd -f ./config/test.env jest --watch",
+    "deploy": "heroku builds:create -a amada-book-butterfly",
+    "web-push": "web-push"
   },
   "jest": {
     "testEnvironment": "node"
@@ -27,7 +29,8 @@
     "multer-s3": "^2.9.0",
     "querystring": "^0.2.0",
     "sharp": "^0.26.2",
-    "validator": "^13.1.17"
+    "validator": "^13.1.17",
+    "web-push": "^3.4.4"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
