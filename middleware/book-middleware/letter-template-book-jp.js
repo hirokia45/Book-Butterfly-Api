@@ -1,6 +1,6 @@
 module.exports = async (req, res, next) => {
   console.log(req.lang)
-  if (req.lang === 'jp') {
+  if (req.lang === 'ja') {
     console.log(req.totalBooksCompleted)
     const totalBooksCompleted = req.totalBooksCompleted + 1
 

@@ -1,5 +1,5 @@
 module.exports = async (req, res, next) => {
-  if (req.lang === 'jp') {
+  if (req.lang === 'ja') {
     const totalNotes = req.totalNotes + 1
 
     switch (totalNotes) {

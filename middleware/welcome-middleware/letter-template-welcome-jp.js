@@ -1,5 +1,5 @@
 module.exports = async (req, res, next) => {
-  if (req.lang === 'jp') {
+  if (req.lang === 'ja') {
     let letter = {
       title: 'Book Butterflyにようこそ！',
       message: '登録してくれてありがとうございます！アプリを楽しんで使っていただけるとうれしいです！',
