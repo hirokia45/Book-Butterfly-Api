@@ -1,11 +1,11 @@
-const Book = require('../../models/note')
+const Book = require('../../models/book')
 
 module.exports = async (req, res, next) => {
   try {
     const totalBooksCompleted = await Book.find({
       completed: true,
       owner: req.user._id,
-    }).countDocuments()
+    }).countDocuments();
 
     req.totalBooksCompleted = totalBooksCompleted
     next()

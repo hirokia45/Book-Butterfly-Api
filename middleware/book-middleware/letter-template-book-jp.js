@@ -1,13 +1,14 @@
 module.exports = async (req, res, next) => {
-  if (req.lang === "en-us") {
-    console.log(req.totalBooksCompleted);
+  console.log(req.lang)
+  if (req.lang === 'jp') {
+    console.log(req.totalBooksCompleted)
     const totalBooksCompleted = req.totalBooksCompleted + 1
 
     switch (totalBooksCompleted) {
       case 1:
         letter = {
-          title: 'Congratulations!',
-          message: 'You have finished your first book!',
+          title: 'おめでとう！',
+          message: '一冊目の本を読み切りました！もっと本を読んでいきましょう',
           icon: 'eva-star-outline',
           color: 'yellow',
           textColor: 'white',
@@ -68,9 +69,8 @@ module.exports = async (req, res, next) => {
       req.letter = letter
     }
     next()
-  }
-  else {
-    console.log('skipped eng template');
-    next ()
+  } else {
+    console.log('skipped jp template')
+    next()
   }
 }

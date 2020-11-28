@@ -18,17 +18,14 @@ exports.signup = async (req, res, next) => {
   try {
     await user.save()
     const token = await user.generateAuthToken()
-    const notification = new Notification({
-      title: 'Welcome to Book Butterfly',
-      message: 'Thank you for signing up! Enjoy this app!',
-      icon: 'eva-smiling-face-outline',
-      color: 'pink-4',
-      textColor: 'white',
+    const letterTemplate = req.letter
+    const letter = new Notification({
+      ...letterTemplate,
       owner: user._id,
     })
-    const welcomeMessage = await notification.save()
+    const welcomeLetter = await letter.save()
 
-    res.status(201).json({ message: 'User created!', token, user, welcomeMessage })
+    res.status(201).json({ message: 'User created!', token, user, welcomeLetter })
   } catch (err) {
 
     if (!err.statusCode) {

@@ -9,12 +9,19 @@ exports.getBookSearch = async (req, res, next) => {
   console.log(search);
   const url = "https://www.googleapis.com/books/v1/volumes?" + qs.stringify({
     q: search,
-    filter: 'partial',
     key: process.env.GOOGLE_API_KEY,
     country: 'JP'
   })
   try {
     const response = await axios.get(url)
+    response.data.items.forEach((book) => {
+      if (book.volumeInfo.imageLinks) {
+        book.volumeInfo.imageLinks.thumbnail = book.volumeInfo.imageLinks.thumbnail.replace(
+          /^http:\/\//i,
+          'https://'
+        )
+      }
+    })
     const books = response.data
     res.status(200).json({
       message: 'Received request successfully',

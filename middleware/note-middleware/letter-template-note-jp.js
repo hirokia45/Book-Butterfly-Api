@@ -1,17 +1,17 @@
 module.exports = async (req, res, next) => {
-  if (req.lang === "en-us") {
+  if (req.lang === 'jp') {
     const totalNotes = req.totalNotes + 1
 
     switch (totalNotes) {
       case 1:
         letter = {
-          title: 'Congratulations!',
-          message: 'You have written your first note!',
+          title: 'おめでとう！',
+          message: '最初のノートを書きました！もっとノートを増やしていきましょう！',
           icon: 'eva-star-outline',
           color: 'yellow',
-          textColor: 'white'
+          textColor: 'white',
         }
-        break;
+        break
       case 5:
         letter = {
           title: 'Keep Going!',
@@ -20,7 +20,7 @@ module.exports = async (req, res, next) => {
           color: 'indigo',
           textColor: 'white',
         }
-        break;
+        break
       case 10:
         letter = {
           title: '10 NOTES!',
@@ -29,16 +29,17 @@ module.exports = async (req, res, next) => {
           color: 'orange',
           textColor: 'white',
         }
-        break;
+        break
       case 20:
         letter = {
           title: 'Congratulations! You earned a bronze trophie!!',
-          message: 'You have written 20 notes! Check out your trophie is profile page!',
+          message:
+            'You have written 20 notes! Check out your trophie is profile page!',
           icon: 'eva-award-outline',
           color: 'orange',
           textColor: 'white',
         }
-        break;
+        break
       case 50:
         letter = {
           title: 'Congratulations! You earned a silver trophie!!',
@@ -48,7 +49,7 @@ module.exports = async (req, res, next) => {
           color: 'grey-4',
           textColor: 'white',
         }
-        break;
+        break
       case 100:
         letter = {
           title: 'Congratulations! You earned a gold trophie!!',
@@ -58,7 +59,7 @@ module.exports = async (req, res, next) => {
           color: 'yellow',
           textColor: 'white',
         }
-        break;
+        break
       default:
         letter = null
     }
@@ -67,7 +68,6 @@ module.exports = async (req, res, next) => {
     }
     next()
   } else {
-    console.log('skipped en-us letter');
     next()
   }
 }
