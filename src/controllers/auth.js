@@ -79,3 +79,14 @@ exports.logoutAll = async (req, res, next) => {
     next(err)
   }
 }
+
+exports.healthCheck = async (req, res, next) => {
+  try {
+    console.log('health check');
+    res.status(200).json({ message: 'Health Check Success' });
+  } catch (err) {
+    const error = new Error('Health Check failed');
+    error.statusCode = 500;
+    next (error)
+  }
+}

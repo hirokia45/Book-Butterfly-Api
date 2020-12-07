@@ -14,5 +14,6 @@ router.put('/auth/signup', detectLang, welcomeLetterEng, welcomeLetterJp, authCo
 router.post('/auth/login', authController.login);
 router.post('/auth/logout', isAuth, authController.logout);
 router.post('/auth/logoutAll', isAuth, authController.logoutAll);
+router.get('/auth/healthcheck', authController.healthCheck);
 
 module.exports = router;

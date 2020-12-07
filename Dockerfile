@@ -1,0 +1,25 @@
+FROM node:14-alpine
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+ENV MONGODB_USERNAME=root
+ENV MONGODB_PASSWORD=secret
+ENV MONGODB_URL=mongodb
+ENV MONGODB_DBNAME=bookbutterfly-dev
+ENV S3_ACCESS_KEY=key
+ENV S3_ACCESS_SECRET=secret
+ENV REGION=region
+ENV BUCKET_NAME=name
+ENV BUCKET_NAME_AVATAR=name
+ENV JWT_SECRET=secret
+ENV GOOGLE_API_KEY=secret
+
+CMD ["npm", "start"]
