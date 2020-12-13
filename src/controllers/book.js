@@ -10,7 +10,8 @@ exports.getBookSearch = async (req, res, next) => {
   const url = "https://www.googleapis.com/books/v1/volumes?" + qs.stringify({
     q: search,
     key: process.env.GOOGLE_API_KEY,
-    country: 'JP'
+    country: 'JP',
+    maxResults: 40
   })
   try {
     const response = await axios.get(url)

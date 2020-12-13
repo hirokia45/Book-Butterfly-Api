@@ -7,18 +7,15 @@ orbs:
 workflows:
     build_and_push_image:
         jobs:
-            steps:
-                - run:
-                    command: echo "export PATH='$PATH:~/bin'" >> $BASH_ENV
-                - aws-ecr/build-and-push-image:
-                    region: AWS_REGION
-                    account-url: AWS_ECR_ACCOUNT_URL
-                    repo: 'book-butterfly-api'
-                    tag: "${CIRCLE_SHA1}"
-                - aws-ecs/deploy-service-update:
-                    requires:
-                        - aws-ecr/build-and-push-image
-                    family: 'book-butterfly-api'
-                    cluster-name: 'book-butterfly'
-                    service-name: 'book-butterfly-api2'
-                    container-image-name-updates: 'container=book-butterfly-api,tag=${CIRCLE_SHA1}'
+        - aws-ecr/build-and-push-image:
+            region: AWS_REGION
+            account-url: AWS_ECR_ACCOUNT_URL
+            repo: 'book-butterfly-api'
+            tag: "${CIRCLE_SHA1}"
+        - aws-ecs/deploy-service-update:
+            requires:
+                - aws-ecr/build-and-push-image
+            family: 'book-butterfly-api'
+            cluster-name: 'book-butterfly'
+            service-name: 'book-butterfly-api2'
+            container-image-name-updates: 'container=book-butterfly-api,tag=${CIRCLE_SHA1}'
