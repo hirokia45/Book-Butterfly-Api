@@ -23,24 +23,21 @@ exports.updateProfile = async (req, res, next) => {
     'password',
     'favoriteBook'
   ]
-  const updatingFields = updates.filter((field) =>
-    allowedUpdates.includes(field)
-  )
-  const isValidOperation = updatingFields.every((update) =>
+  const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   )
 
   if (!isValidOperation || !errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.')
     error.statusCode = 422
-    throw error
+    next(error)
   }
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token
     })
 
-    updatingFields.forEach((update) => req.user[update] = req.body[update])
+    updates.forEach((update) => req.user[update] = req.body[update])
     await req.user.save()
 
     const token = await req.user.generateAuthToken()

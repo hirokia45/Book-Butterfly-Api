@@ -122,14 +122,13 @@ exports.updateNote = async (req, res, next) => {
 
   const updates = Object.keys(req.body)
   const allowedUpdates = ["title", "author", "category", "pageFrom", "pageTo", "chapter", "comment"]
-  const updatingFields = updates.filter((field) => allowedUpdates.includes(field));
-  const isValidOperation = updatingFields.every((update) => allowedUpdates.includes(update))
-
+  const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
   if (!isValidOperation) {
     const error = new Error('Validation failed, entered data is incorrect.');
     error.statusCode = 422;
-    throw error;
+    next(error)
   }
+
   try {
     const note = await Note.findOne({ _id, owner: req.user._id})
 
@@ -139,7 +138,7 @@ exports.updateNote = async (req, res, next) => {
       throw error
     }
 
-    updatingFields.forEach((update) => (note[update] = req.body[update]))
+    updates.forEach((update) => (note[update] = req.body[update]))
     const result = await note.save()
 
     const noteModified = {
@@ -150,6 +149,7 @@ exports.updateNote = async (req, res, next) => {
       note: noteModified,
     })
   } catch (err) {
+    console.log(err);
     if (!err.statusCode) {
       err.statusCode = 500
     }
