@@ -1,6 +1,6 @@
 const app = require('./app')
 
 
-app.listen(443, () => {
-  console.log("Server is up on port 443");
+app.listen(3000, () => {
+  console.log("Server is up on port 3000");
 })
